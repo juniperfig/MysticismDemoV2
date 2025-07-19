@@ -57,7 +57,10 @@ class MysticismLifecycleManager(private val plugin: JavaPlugin) {
      */
     fun initializeAndRegisterComponents(sender: CommandSender?) {
         plugin.logger.info("Initializing/Reloading MysticismDemoV2 components...")
-
+        // Hide and remove boss bars from the PREVIOUS MysticismBar instance if it exists.
+        if (::mysticismBar.isInitialized) {
+            mysticismBar.hideAllMysticismBars()
+        }
         // Step 1: Unregister any existing listeners before creating new instances.
         // allows for a clean reload to prevent duplicate event handling.
         registeredPotionListener?.let { HandlerList.unregisterAll(it) }
