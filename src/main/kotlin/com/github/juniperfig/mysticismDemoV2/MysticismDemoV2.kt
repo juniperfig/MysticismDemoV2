@@ -20,23 +20,34 @@ class MysticismDemoV2 : JavaPlugin() {
         // This call will load config, initialize all managers, and register their listeners/commands
         mysticismLifecycleManager.initializeAndRegisterComponents(null) // Pass null as sender, since it's startup
 
-        // Register Commands that are not handled by managers and don't change on reload
-        // These need access to MysticismTracker and MessageService via the lifecycleManager's getters
-        getCommand("setmyst")?.setExecutor(
-            SetMystCommand(
-                mysticismLifecycleManager.getMysticismTracker(),
-                mysticismLifecycleManager.getMessageService()
-            )
+        // Create instances of the individual command executors
+        val setMystCommand = SetMystCommand(
+            mysticismLifecycleManager.getMysticismTracker(),
+            mysticismLifecycleManager.getMessageService()
         )
-        getCommand("checkmyst")?.setExecutor(
-            CheckMystCommand(
-                mysticismLifecycleManager.getMysticismTracker(),
-                mysticismLifecycleManager.getMessageService()
-            )
+        val checkMystCommand = CheckMystCommand(
+            mysticismLifecycleManager.getMysticismTracker(),
+            mysticismLifecycleManager.getMessageService()
         )
+        // The mysticismReloadCommand instance is created here
+        val mysticismReloadCommand = MysticismReloadCommand(this, mysticismLifecycleManager)
 
-        // Register the ReloadCommand for /mysticism
-        getCommand("mysticism")?.setExecutor(MysticismReloadCommand(this, mysticismLifecycleManager))
+        // Register the MysticismRootCommand as the executor for the "mysticism" command.
+        // This command will now handle "setmyst", "checkmyst", and "reload" as subcommands.
+        val rootCommand = getCommand("mysticism")
+        if (rootCommand != null) {
+            rootCommand.setExecutor(
+                MysticismRootCommand(
+                    this, // The 'plugin' instance
+                    setMystCommand,
+                    checkMystCommand,
+                    mysticismReloadCommand
+                )
+            )
+            logger.info("MysticismDemoV2: Successfully set MysticismRootCommand executor for /mysticism.")
+        } else {
+            logger.warning("MysticismDemoV2: Command 'mysticism' not found in plugin.yml or could not be retrieved. Command registration failed!")
+        }
 
         // Register Listeners that are not handled by managers and don't change on reload
         // These need access to MysticismDrainService, MysticismTracker, and MysticismBar
