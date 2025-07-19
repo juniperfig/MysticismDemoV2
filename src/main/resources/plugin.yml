@@ -1,0 +1,25 @@
+main: com.github.juniperfig.mysticismDemoV2.MysticismDemoV2
+name: MysticismDemoV2
+version: 1.0.0
+author: juniperfig
+description: A demo plugin for mysticism mechanics.
+
+commands:
+  mysticism:
+    description: Main command for the Mysticism plugin.
+    usage: /mysticism <subcommand> [args]
+    aliases: [myst]
+
+permissions:
+  mysticism.use:
+    description: Allows a player to use the /mysticism command.
+    default: true # Changed to TRUE: Everyone has this by default
+  mysticism.setmyst:
+    description: Allows a player to use /mysticism setmyst.
+    default: true # Changed to TRUE: Everyone has this by default
+  mysticism.checkmyst:
+    description: Allows a player to use /mysticism checkmyst.
+    default: true # Changed to TRUE: Everyone has this by default
+  mysticism.reload:
+    description: Allows a player to use /mysticism reload.
+    default: true # Changed to TRUE: Everyone has this by default

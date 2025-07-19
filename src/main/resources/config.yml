@@ -1,0 +1,9 @@
+mysticism:
+  drainRateMob: 0.01
+  drainRateFlight: 0.05
+  chargeAmountPotion: 0.9
+
+# This should be set to the lowest mysticism cost of any ability we have.
+# or even 0.0 if you want it always visible until truly empty.
+barVisibility:
+  minMysticismForBar: 0.05 # it's 0.05 right now since the only implemented ability is the flight one.
