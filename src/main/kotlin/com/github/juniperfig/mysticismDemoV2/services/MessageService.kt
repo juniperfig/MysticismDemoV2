@@ -11,7 +11,7 @@ import org.bukkit.entity.Player
  * Centralizes messaging logic for easier modification and consistency.
  */
 
-class MessageService {
+object MessageService {
 
     // --- Mysticism Related Messages ---
 

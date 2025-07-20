@@ -22,14 +22,14 @@ import kotlin.math.min
  * @property mysticismLevels A [ConcurrentHashMap] where the key is the player's [UUID]
  * and the value is their current mysticism level ([Double]). This map is thread-safe.
  */
-class MysticismTracker {
+object MysticismTracker {
     private val mysticismLevels: ConcurrentHashMap<UUID, Double> = ConcurrentHashMap()
 
     /**
      * The maximum mysticism level a player can have.
      * Mysticism levels are clamped between 0.0 and this maximum.
      */
-    private val maxMysticismLevel = 1.0 // Mysticism is represented as a percentage (0.0 to 1.0)
+    private const val maxMysticismLevel = 1.0 // Mysticism is represented as a percentage (0.0 to 1.0)
 
     /**
      * A callback function that will be invoked whenever a player's mysticism level changes.
