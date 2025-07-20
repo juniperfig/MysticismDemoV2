@@ -19,10 +19,7 @@ import org.bukkit.event.player.PlayerQuitEvent
  * @property mysticismDrainService The [MysticismDrainService] instance, used to stop any active drain tasks for the quitting player.
  * @property mysticismTracker The [MysticismTracker] instance, used to remove the player's mysticism data.
  */
-class PlayerQuitListener(
-    private val mysticismDrainService: MysticismDrainService,
-    private val mysticismTracker: MysticismTracker
-) : Listener {
+class PlayerQuitListener : Listener {
 
     /**
      * Handles the [PlayerQuitEvent], triggered when a player disconnects.
@@ -37,8 +34,8 @@ class PlayerQuitListener(
     fun onPlayerQuit(event: PlayerQuitEvent) {
         val player = event.player
         // Now, we use the robust method to clear ALL drain sources for the player.
-        mysticismDrainService.clearAllDrainSourcesForPlayer(player.uniqueId)
-        mysticismTracker.removeMysticism(player.uniqueId) // Remove player's data from the tracker
+        MysticismDrainService.clearAllDrainSourcesForPlayer(player.uniqueId)
+        MysticismTracker.removeMysticism(player.uniqueId) // Remove player's data from the tracker
         // BossBar cleanup for a specific player on quit is implicitly handled if the level hits 0,
         // and globally by `mysticismBar.hideAllMysticismBars()` on plugin disable.
     }
