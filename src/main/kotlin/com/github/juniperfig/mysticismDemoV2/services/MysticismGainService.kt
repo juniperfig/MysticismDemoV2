@@ -9,14 +9,8 @@ import org.bukkit.entity.Player
  * This service is responsible for handling the application of "mysticism charge" effects to players.
  * It acts as a central point for increasing a player's mysticism level, ensuring that all
  * necessary updates and notifications occur when mysticism is gained (e.g., from consuming a potion).
- *
- * @property mysticismTracker The [MysticismTracker] instance used to get and set player mysticism levels.
- * @property messageService The [MessageService] instance used to send messages to players.
  */
-class MysticismGainService(
-    private val mysticismTracker: MysticismTracker,
-    private val messageService: MessageService
-) {
+object MysticismGainService {
 
     /**
      * Increases a player's mysticism level.
@@ -34,11 +28,11 @@ class MysticismGainService(
     fun gainMysticism(player: Player, amount: Double, cap: Double = 1.0) {
         val uuid = player.uniqueId
         // Get the player's current mysticism level.
-        val current = mysticismTracker.getMysticism(uuid)
+        val current = MysticismTracker.getMysticism(uuid)
         // Calculate the new mysticism level, ensuring it does not exceed the specified cap.
         val newLevel = (current + amount).coerceAtMost(cap)
-        mysticismTracker.setMysticism(uuid, newLevel)
+        MysticismTracker.setMysticism(uuid, newLevel)
         // Send a message to the player indicating they felt a surge of mysticism.
-        messageService.sendMysticismSurge(player)
+        MessageService.sendMysticismSurge(player)
     }
 }

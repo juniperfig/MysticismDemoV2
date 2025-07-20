@@ -2,6 +2,7 @@
 
 package com.github.juniperfig.mysticismDemoV2.managers
 
+import com.github.juniperfig.mysticismDemoV2.MysticismDemoV2.Companion.plugin
 import com.github.juniperfig.mysticismDemoV2.config.PluginConfig
 import com.github.juniperfig.mysticismDemoV2.services.MessageService
 import org.bukkit.entity.Player
@@ -26,10 +27,7 @@ import org.bukkit.plugin.Plugin
  * @property pluginConfig The [PluginConfig] instance, providing access to all configurable values.
  */
 class MysticismEffectManager(
-    private val plugin: Plugin,
-    @Volatile private var flightManager: FlightManager? = null,
-    private val mysticismBar: MysticismBar,
-    private val messageService: MessageService,
+    private var flightManager: FlightManager? = null,
     private val pluginConfig: PluginConfig
 ) {
     /**
@@ -39,10 +37,12 @@ class MysticismEffectManager(
      *
      * @param manager The initialized [FlightManager] instance.
      */
+/*
     fun setFlightManager(manager: FlightManager) {
         this.flightManager = manager
         plugin.logger.info("EFFECT: FlightManager has been set in MysticismEffectManager.")
     }
+*/
 
     /**
      * Callback method invoked by the [MysticismTracker] whenever a player's mysticism level changes.
@@ -61,13 +61,13 @@ class MysticismEffectManager(
         plugin.logger.info("MYST_EFFECT_DEBUG: Configured minMysticismForBar: ${pluginConfig.minMysticismForBar}")
         plugin.logger.info("MYST_EFFECT_DEBUG: Configured drainRateFlight: ${pluginConfig.drainRateFlight}")
 
-        mysticismBar.updateMysticismBar(player, newLevel)
+        MysticismBar.updateMysticismBar(player, newLevel)
 
         //Bar visibility based on minMysticismForBar from config
         if (newLevel >= pluginConfig.minMysticismForBar) {
-            mysticismBar.showMysticismBar(player)
+            MysticismBar.showMysticismBar(player)
         } else { // newLevel < minMysticismForBar
-            mysticismBar.hideMysticismBar(player)
+            MysticismBar.hideMysticismBar(player)
         }
 
         // Flight ability is tied to drainRateFlight from config
@@ -80,7 +80,7 @@ class MysticismEffectManager(
             flightManager?.let { fm ->
                 fm.setFlightEnabled(player, false)
                 if (player.isFlying) {
-                    messageService.sendMessage(player, "You have run out of mysticism and can no longer fly!")
+                    MessageService.sendMessage(player, "You have run out of mysticism and can no longer fly!")
                 }
                 plugin.logger.info("MYST_EFFECT: Calling setFlightEnabled(false) for ${player.name} (Mysticism < drainRateFlight).")
             } ?: plugin.logger.warning("MYST_EFFECT: FlightManager is null when trying to disable flight for ${player.name}!")

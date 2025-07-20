@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap
  * @property bossBars A [ConcurrentHashMap] that stores the [BossBar] instance for each player.
  * The key is the player's [UUID], and the value is their associated [BossBar].
  */
-class MysticismBar {
+object MysticismBar {
     private val bossBars: ConcurrentHashMap<UUID, BossBar> = ConcurrentHashMap()
 
     /**

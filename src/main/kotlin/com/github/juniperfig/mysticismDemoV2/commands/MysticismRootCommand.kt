@@ -1,25 +1,51 @@
 package com.github.juniperfig.mysticismDemoV2.commands
 
-import com.github.juniperfig.mysticismDemoV2.lifecycle.MysticismLifecycleManager
+import io.papermc.paper.command.brigadier.BasicCommand
+import io.papermc.paper.command.brigadier.CommandSourceStack
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
-import org.bukkit.command.Command
-import org.bukkit.command.CommandExecutor
+import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
-import org.bukkit.plugin.java.JavaPlugin
 
-class MysticismRootCommand(
-    private val plugin: JavaPlugin,
-    private val mysticismLifecycleManager: MysticismLifecycleManager,
-    private val setMystCommand: SetMystCommand,
-    private val checkMystCommand: CheckMystCommand,
-    private val mysticismReloadCommand: MysticismReloadCommand
-) : CommandExecutor {
+class MysticismRootCommand : BasicCommand {
 
-    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
+    override fun permission(): String {
+        return "mysticism.use"
+    }
+
+    // Basic suggestions when running commands
+    override fun suggest(source: CommandSourceStack, args: Array<out String>): MutableCollection<String> {
+        // No args show all available
+        if (args.isEmpty()) {
+            return mutableListOf("setmyst", "checkmyst", "reload")
+        }
+
+        val subCommand = args[0].lowercase()
+
+        return when (subCommand) {
+            "setmyst" -> {
+                playerList()
+            }
+
+            "checkmyst" -> {
+               playerList()
+            }
+
+            else -> {
+                mutableListOf()
+            }
+        }
+    }
+
+    // Gets a list of online players for command suggestions
+    private fun playerList() = Bukkit.getOnlinePlayers().map { it.name }.toMutableList()
+
+    override fun execute(source: CommandSourceStack, args: Array<out String>) {
+        // Help menu
+        val sender = source.sender
         if (args.isEmpty()) {
             sendUsage(sender)
-            return true
+            return
         }
 
         val subCommand = args[0].lowercase()
@@ -27,18 +53,18 @@ class MysticismRootCommand(
 
         when (subCommand) {
             "setmyst" -> {
-                return setMystCommand.onCommand(sender, command, "mysticism setmyst", subCommandArgs)
+                SetMystCommand.onCommand(source, "mysticism setmyst", *subCommandArgs)
             }
             "checkmyst" -> {
-                return checkMystCommand.onCommand(sender, command, "mysticism checkmyst", subCommandArgs)
+                CheckMystCommand.onCommand(source, "mysticism checkmyst", *subCommandArgs)
             }
             "reload" -> {
-                return mysticismReloadCommand.onCommand(sender, command, "mysticism reload", subCommandArgs)
+                MysticismReloadCommand.onCommand(source, "mysticism reload", *subCommandArgs)
             }
             else -> {
                 sender.sendMessage(Component.text("Unknown subcommand: '$subCommand'.", NamedTextColor.RED))
                 sendUsage(sender)
-                return true
+                return
             }
         }
     }

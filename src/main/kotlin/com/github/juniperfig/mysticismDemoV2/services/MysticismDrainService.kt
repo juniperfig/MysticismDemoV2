@@ -1,5 +1,6 @@
 package com.github.juniperfig.mysticismDemoV2.services
 
+import com.github.juniperfig.mysticismDemoV2.MysticismDemoV2.Companion.plugin
 import com.github.juniperfig.mysticismDemoV2.managers.MysticismTracker
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -23,10 +24,7 @@ import java.util.concurrent.ConcurrentHashMap
  * The inner map maps a [String] drain source ID (e.g., "flight") to its
  * corresponding drain rate ([Double]). This tracks all active reasons for drain.
  */
-class MysticismDrainService(
-    private val plugin: Plugin,
-    private val mysticismTracker: MysticismTracker
-) {
+object MysticismDrainService {
     // Stores the active drain task for each player
     private val activeDrainTasks: ConcurrentHashMap<UUID, BukkitTask> = ConcurrentHashMap()
 
@@ -114,7 +112,7 @@ class MysticismDrainService(
             if (totalDrainRate > 0.0) {
                 // Drain mysticism. The addMysticism method handles clamping at 0.0.
                 // We pass a negative value to subtract.
-                mysticismTracker.addMysticism(player.uniqueId, -totalDrainRate)
+                MysticismTracker.addMysticism(player.uniqueId, -totalDrainRate)
             } else {
                 // No more active sources, stop the task.
                 // This shouldn't be reached if removeDrainSource is called correctly,

@@ -1,22 +1,21 @@
 package com.github.juniperfig.mysticismDemoV2.commands
 
+import com.github.juniperfig.mysticismDemoV2.MysticismDemoV2.Companion.plugin
 import com.github.juniperfig.mysticismDemoV2.lifecycle.MysticismLifecycleManager
-import org.bukkit.command.Command
-import org.bukkit.command.CommandExecutor
-import org.bukkit.command.CommandSender
-import org.bukkit.plugin.java.JavaPlugin
+import com.github.juniperfig.mysticismDemoV2.services.MessageService
+import io.papermc.paper.command.brigadier.CommandSourceStack
 
-class MysticismReloadCommand(
-    private val plugin: JavaPlugin,
-    private val lifecycleManager: MysticismLifecycleManager
-) : CommandExecutor {
+object MysticismReloadCommand : MystSubCommand {
 
-    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
+    override val permission: String = "mysticism.reload"
+
+    override fun onCommand(source: CommandSourceStack, label: String, vararg args: String) {
+        val sender = source.sender
+
+        takeIf { hasPermission(sender) } ?: MessageService.sendNoPermission(sender, permission)
 
         // Perform the actual reload logic
         plugin.reloadConfig() // Bukkit's built-in method to load config.yml from disk
-        lifecycleManager.initializeAndRegisterComponents(sender) // Delegate to the lifecycle manager
-
-        return true // Command handled successfully
+        MysticismLifecycleManager.initializeAndRegisterComponents(sender) // Delegate to the lifecycle manager
     }
 }

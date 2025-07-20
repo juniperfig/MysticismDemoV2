@@ -8,7 +8,6 @@ import org.bukkit.event.Listener
 import org.bukkit.event.entity.PotionSplashEvent
 
 class PotionListener(
-    private val mysticismGainService: MysticismGainService,
     private val pluginConfig: PluginConfig
 ) : Listener {
 
@@ -16,7 +15,7 @@ class PotionListener(
     fun onPotionSplash(event: PotionSplashEvent) { //this needs to be updated later to only work with a specific potion but it's fine for now
         for (entity in event.affectedEntities) {
             if (entity is Player) {
-                mysticismGainService.gainMysticism(entity, pluginConfig.chargeAmountPotion)
+                MysticismGainService.gainMysticism(entity, pluginConfig.chargeAmountPotion)
             }
         }
     }

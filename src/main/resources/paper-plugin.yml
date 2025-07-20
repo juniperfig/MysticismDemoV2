@@ -1,0 +1,6 @@
+name: MysticismDemoV2
+version: 1.0.0
+main: com.github.juniperfig.mysticismDemoV2.MysticismDemoV2
+description:  A demo plugin for mysticism mechanics.
+api-version: '1.21.1'
+loader: com.github.juniperfig.mysticismDemoV2.ExternalDependencyLoader
