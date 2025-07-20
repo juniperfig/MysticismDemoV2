@@ -2,6 +2,7 @@
 
 package com.github.juniperfig.mysticismDemoV2.managers
 
+import com.github.juniperfig.mysticismDemoV2.MysticismDemoV2.Companion.plugin
 import com.github.juniperfig.mysticismDemoV2.config.PluginConfig
 import com.github.juniperfig.mysticismDemoV2.interfaces.FlightController
 import com.github.juniperfig.mysticismDemoV2.services.MessageService
@@ -35,10 +36,6 @@ import org.bukkit.plugin.Plugin
  *
  */
 class FlightManager(
-    private val plugin: Plugin,
-    private val mysticismTracker: MysticismTracker,
-    private val mysticismDrainService: MysticismDrainService,
-    private val messageService: MessageService,
     private val pluginConfig: PluginConfig
 ) : FlightController, Listener {
 
@@ -70,7 +67,7 @@ class FlightManager(
             if (player.allowFlight) {
                 player.allowFlight = false
                 player.isFlying = false // Force the player to land if they were flying.
-                mysticismDrainService.removeDrainSource(player, "flight")
+                MysticismDrainService.removeDrainSource(player, "flight")
                 plugin.logger.info("FLIGHT_MANAGER: ${player.name} no longer has flight ability (allowFlight=false).")
             } else {
                 plugin.logger.info("FLIGHT_MANAGER: ${player.name} already does not have flight ability (allowFlight=false), no change.")
@@ -91,7 +88,7 @@ class FlightManager(
     fun onPlayerToggleFlight(event: PlayerToggleFlightEvent) {
         val player = event.player
         if (player.gameMode == GameMode.SURVIVAL || player.gameMode == GameMode.ADVENTURE) {
-            val currentMysticism = mysticismTracker.getMysticism(player.uniqueId)
+            val currentMysticism = MysticismTracker.getMysticism(player.uniqueId)
             // Access drainRateFlight directly from pluginConfig
             val requiredFlightMysticism = pluginConfig.drainRateFlight // NEW LOCAL VARIABLE FOR CLARITY
 
@@ -102,25 +99,25 @@ class FlightManager(
                     event.isCancelled = false
                     player.isFlying = true
                     // Inform the MysticismDrainService that "flight" is now an active drain source.
-                    mysticismDrainService.addDrainSource(player, "flight", requiredFlightMysticism) // Use requiredFlightMysticism
-                    messageService.sendFlightEnabled(player)
+                    MysticismDrainService.addDrainSource(player, "flight", requiredFlightMysticism) // Use requiredFlightMysticism
+                    MessageService.sendFlightEnabled(player)
                     plugin.logger.info("FLIGHT_MANAGER: ${player.name} started flying. Drain source 'flight' added.")
                 } else {
                     event.isCancelled = true
                     player.isFlying = false
                     // MODIFIED: Condition and message to reflect requiredFlightMysticism as the minimum
                     if (currentMysticism < requiredFlightMysticism) {
-                        messageService.sendMessage(player, "You do not have enough mysticism to fly! (Requires at least ${requiredFlightMysticism * 100}%)")
+                        MessageService.sendMessage(player, "You do not have enough mysticism to fly! (Requires at least ${requiredFlightMysticism * 100}%)")
                     } else if (!player.allowFlight) {
-                        messageService.sendMessage(player, "Your flight ability is currently disabled!")
+                        MessageService.sendMessage(player, "Your flight ability is currently disabled!")
                     }
                     plugin.logger.info("FLIGHT_MANAGER: ${player.name} tried to fly but was prevented (Mysticism: $currentMysticism, AllowFlight: ${player.allowFlight}).")
                 }
             } else { // Player is attempting to *stop* flying (e.g., landing)
                 // Inform the MysticismDrainService that "flight" is no longer an active drain source.
                 // The service will handle stopping the overall drain task if no other sources are active.
-                mysticismDrainService.removeDrainSource(player, "flight")
-                messageService.sendFlightDisabled(player)
+                MysticismDrainService.removeDrainSource(player, "flight")
+                MessageService.sendFlightDisabled(player)
                 plugin.logger.info("FLIGHT_MANAGER: ${player.name} stopped flying. Drain source 'flight' removed.")
             }
         }
@@ -142,7 +139,7 @@ class FlightManager(
 
         // Only re-evaluate flight if they are entering a game mode where our custom flight applies.
         if (newGameMode == GameMode.SURVIVAL || newGameMode == GameMode.ADVENTURE) {
-            val currentMysticism = mysticismTracker.getMysticism(player.uniqueId)
+            val currentMysticism = MysticismTracker.getMysticism(player.uniqueId)
             plugin.logger.info("FLIGHT_MANAGER: ${player.name} entered $newGameMode. Current mysticism: $currentMysticism.")
 
             // If the player has any mysticism (greater than 0), we want to allow them to fly.
@@ -151,7 +148,7 @@ class FlightManager(
             // MODIFIED: Use pluginConfig.drainRateFlight for the check
             if (currentMysticism >= pluginConfig.drainRateFlight) { // Changed to >= pluginConfig.drainRateFlight for consistency
                 setFlightEnabled(player, true)
-                messageService.sendMessage(player, "Your mysticism flight ability has been re-evaluated.")
+                MessageService.sendMessage(player, "Your mysticism flight ability has been re-evaluated.")
                 plugin.logger.info("FLIGHT_MANAGER: ${player.name}'s flight re-enabled due to mysticism after gamemode change.")
             } else {
                 // If they have no mysticism or not enough for flight, ensure flight is disabled in these game modes.
